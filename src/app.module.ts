@@ -14,7 +14,7 @@ import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./auth/jwt-auth.guard";
 
 @Module({
-  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, MongooseModule.forRoot('mongodb://localhost:27017/Legalia')],
+  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, MongooseModule.forRoot('process.env.MONGODB_URI')],
   controllers: [AppController],
   providers: [AppService,
   {
