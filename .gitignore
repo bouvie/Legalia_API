@@ -107,3 +107,5 @@ dist
 package-lock.json
 test.docx
 computed.docx
+.DS_Store
+

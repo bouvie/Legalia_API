@@ -6,6 +6,6 @@ import * as fs from "fs";
 async function bootstrap() {
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  await app.listen(2700);
+  await app.listen(process.env.PORT || 5000);
 }
 bootstrap();
