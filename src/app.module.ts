@@ -12,9 +12,10 @@ import {BlocService} from "./bloc/bloc.service";
 import {BlocController} from "./bloc/bloc.controller";
 import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./auth/jwt-auth.guard";
+import {ConfigModule} from "@nestjs/config";
 
 @Module({
-  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, MongooseModule.forRoot('mongodb://localhost:27017/Legalia')],
+  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, ConfigModule.forRoot(), MongooseModule.forRoot(process.env.MONGODB_URI)],
   controllers: [AppController],
   providers: [AppService,
   {
