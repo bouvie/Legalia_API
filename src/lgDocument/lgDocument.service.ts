@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {HttpException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {LgDocument} from "./lgDocument.model";
 import {Model} from "mongoose";
@@ -13,7 +13,12 @@ export class LgDocumentService {
     ) {}
 
     async findOne(documentId: string): Promise<LgDocument | undefined> {
-        return this.lgDocumentModel.findOne({_id : new mongoose.Schema.Types.ObjectId(documentId)});
+        try {
+            const mongooseDocumentId = new mongoose.Types.ObjectId(documentId);
+            return this.lgDocumentModel.findOne({_id : mongooseDocumentId});
+        } catch {
+            throw new HttpException("Wrong id format", 402)
+        }
     }
 
     async createOne(document : Partial<LgDocument>): Promise<LgDocument | undefined> {

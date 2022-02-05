@@ -1,9 +1,8 @@
-import {Controller, Get, Logger, Post, Request} from '@nestjs/common';
+import {Controller, Get, Logger, Param, Post, Request} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
-import * as parser from 'xml2json'
 
 
 @Controller('document')
@@ -17,12 +16,12 @@ export class LgDocumentController {
     }
 
     @Get(':documentId')
-    async findOne(@Request() req) {
-        return this.lgDocumentService.findOne(req.params.documentId);
+    async findOne(@Param('documentId') id : string) {
+        return this.lgDocumentService.findOne(id);
     }
 
     @Get('')
-    async findAll(@Request() req) {
+    async findAll() {
         return this.lgDocumentService.findAll()
     }
 
