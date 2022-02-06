@@ -1,26 +1,32 @@
-import {Body, Controller, Get, Logger, Param, Post, Put, Request} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, Logger, Param, Post, Put, Request} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
 import {LgDocumentDTO} from "./lgDocument.model";
+import {UsersService} from "../users/users.service";
 
 
 @Controller('document')
 export class LgDocumentController {
-    constructor(private lgDocumentService: LgDocumentService) {}
+    constructor(private lgDocumentService: LgDocumentService,
+                private usersService: UsersService) {}
 
     @Post('')
     async createOne(@Body() document : LgDocumentDTO) {
-        try {
-            return this.lgDocumentService.createOne(document);
-        } catch {
-
+        const user = await this.usersService.findById(document.user);
+        if (!user) {
+            return new HttpException("user not found", 405);
         }
+        return this.lgDocumentService.createOne(document);
     }
 
     @Put(':documentId')
     async updateOne(@Param('documentId') documentId : string, @Body() document : LgDocumentDTO) {
+        const user = await this.usersService.findById(document.user);
+        if (!user) {
+            return new HttpException("user not found", 405);
+        }
        return this.lgDocumentService.updateOne(document, documentId);
     }
 

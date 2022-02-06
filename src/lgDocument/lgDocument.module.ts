@@ -5,6 +5,7 @@ import {MongooseModule} from "@nestjs/mongoose";
 import {LgDocument, LgDocumentSchema} from "./lgDocument.model";
 import {UsersModule} from "../users/users.module";
 import {Users, UsersSchema} from "../users/users.model";
+import {UsersService} from "../users/users.service";
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import {Users, UsersSchema} from "../users/users.model";
   ],
   exports: [LgDocumentService],
   controllers: [LgDocumentController],
-  providers: [LgDocumentService]
+  providers: [LgDocumentService, UsersService]
 })
 export class LgDocumentModule {}

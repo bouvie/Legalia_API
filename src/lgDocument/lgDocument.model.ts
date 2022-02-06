@@ -8,7 +8,7 @@ export class LgDocument extends Document {
     @Prop()
     name: string;
 
-    @Prop({unique : true})
+    @Prop()
     path: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Users.name, required : true })
@@ -26,5 +26,5 @@ export class LgDocumentDTO {
 
     @IsDefined()
     @IsNotEmpty()
-    user: Users;
+    user: string;
 }
