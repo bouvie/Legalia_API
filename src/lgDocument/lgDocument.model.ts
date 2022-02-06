@@ -2,10 +2,10 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from "mongoose";
 import {Users} from "../users/users.model";
-
+import {IsNotEmpty, IsDefined } from 'class-validator';
 @Schema()
 export class LgDocument extends Document {
-    @Prop({required : true})
+    @Prop()
     name: string;
 
     @Prop({unique : true})
@@ -16,3 +16,15 @@ export class LgDocument extends Document {
 }
 
 export const LgDocumentSchema = SchemaFactory.createForClass(LgDocument);
+
+export class LgDocumentDTO {
+    @Prop()
+    name: string;
+
+    @Prop()
+    path: string;
+
+    @IsDefined()
+    @IsNotEmpty()
+    user: Users;
+}

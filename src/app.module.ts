@@ -12,9 +12,10 @@ import {BlocService} from "./bloc/bloc.service";
 import {BlocController} from "./bloc/bloc.controller";
 import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./auth/jwt-auth.guard";
+import {ConfigModule} from "@nestjs/config";
 
 @Module({
-  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb+srv://Legalia-Admin-Dev:6yzPz6VYEi7vM3@Legalia-dev.8jb0o.mongodb.net/Legalia?retryWrites=true&w=majority&ssl=true')],
+  imports: [AuthModule, UsersModule,  LgDocumentModule, BlocModule, ConfigModule.forRoot(), MongooseModule.forRoot(process.env.MONGODB_URI)],
   controllers: [AppController],
   providers: [AppService,
   {

@@ -1,9 +1,9 @@
-import {Controller, Get, Logger, Post, Request} from '@nestjs/common';
+import {Body, Controller, Get, Logger, Param, Post, Put, Request} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
-import * as parser from 'xml2json'
+import {LgDocumentDTO} from "./lgDocument.model";
 
 
 @Controller('document')
@@ -11,23 +11,32 @@ export class LgDocumentController {
     constructor(private lgDocumentService: LgDocumentService) {}
 
     @Post('')
-    async createOne(@Request() req) {
-        console.log('creating new Document');
-        return this.lgDocumentService.createOne(req.body);
+    async createOne(@Body() document : LgDocumentDTO) {
+        try {
+            return this.lgDocumentService.createOne(document);
+        } catch {
+
+        }
     }
 
+    @Put(':documentId')
+    async updateOne(@Param('documentId') documentId : string, @Body() document : LgDocumentDTO) {
+       return this.lgDocumentService.updateOne(document, documentId);
+    }
+
+
     @Get(':documentId')
-    async findOne(@Request() req) {
-        return this.lgDocumentService.findOne(req.params.documentId);
+    async findOne(@Param('documentId') documentId : string) {
+        return this.lgDocumentService.findOne(documentId);
     }
 
     @Get('')
-    async findAll(@Request() req) {
+    async findAll() {
         return this.lgDocumentService.findAll()
     }
 
-    @Post('/compute')
-    async computeTemplate(){
+    @Post('/compute/:documentId')
+    async computeTemplate(@Param('documentId') documentId : string){
         const content = fs.readFileSync(
             path.resolve( "./test.docx"),
             "binary"
