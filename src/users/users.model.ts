@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import {IsOptional} from "class-validator";
+import {IsDefined, IsEmail, IsNotEmpty} from "class-validator";
 import * as mongoose from "mongoose";
 
 @Schema()
@@ -30,9 +30,10 @@ export class Users extends Document {
 export const UsersSchema = SchemaFactory.createForClass(Users);
 
 export class usersLoginDTO {
+    @IsDefined()
+    @IsNotEmpty()
+    @IsEmail()
     email: string;
-
-    password: string;
 
     _id : mongoose.Types.ObjectId;
 }
