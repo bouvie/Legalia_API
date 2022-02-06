@@ -1,10 +1,10 @@
-import {Body, Controller, Get, HttpException, Logger, Param, Post, Put, Request} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, Param, Post, Put} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
 import {LgDocumentDTO} from "./lgDocument.model";
-import {UsersService} from "../users/users.service";
+import {UsersService} from "../../users/users.service";
 
 
 @Controller('document')

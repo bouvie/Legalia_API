@@ -3,19 +3,16 @@ import {LgDocumentService} from "./lgDocument.service";
 import {LgDocumentController} from "./lgDocument.controller";
 import {MongooseModule} from "@nestjs/mongoose";
 import {LgDocument, LgDocumentSchema} from "./lgDocument.model";
-import {UsersModule} from "../users/users.module";
-import {Users, UsersSchema} from "../users/users.model";
-import {UsersService} from "../users/users.service";
+import {UsersModule} from "../../users/users.module";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: LgDocument.name, schema: LgDocumentSchema },
-      { name: Users.name, schema: UsersSchema },
-    ])
+    ]), UsersModule
   ],
   exports: [LgDocumentService],
   controllers: [LgDocumentController],
-  providers: [LgDocumentService, UsersService]
+  providers: [LgDocumentService]
 })
 export class LgDocumentModule {}
