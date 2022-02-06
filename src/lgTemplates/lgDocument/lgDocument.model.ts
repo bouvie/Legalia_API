@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from "mongoose";
-import {Users} from "../users/users.model";
+import {Users} from "../../users/users.model";
 import {IsNotEmpty, IsDefined } from 'class-validator';
 @Schema()
 export class LgDocument extends Document {
