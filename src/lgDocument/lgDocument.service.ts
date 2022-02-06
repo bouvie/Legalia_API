@@ -13,25 +13,15 @@ export class LgDocumentService {
     ) {}
 
     async findOne(documentId: string): Promise<LgDocument | undefined> {
-        try {
-            const mongooseDocumentId = new mongoose.Types.ObjectId(documentId);
-            return this.lgDocumentModel.findOne({_id : mongooseDocumentId});
-        } catch {
-            throw new HttpException("Wrong id format", 405)
-        }
+        return this.lgDocumentModel.findOne({_id : documentId});
     }
 
-    async createOne(document : LgDocumentDTO): Promise<LgDocument | undefined> {
-        return this.lgDocumentModel.create(document);
+    async createOne(document : LgDocumentDTO): Promise<LgDocument | HttpException> {
+            return this.lgDocumentModel.create(document);
     }
 
-    async updateOne(document : LgDocumentDTO, documentId : string): Promise<LgDocument | undefined> {
-        try {
-            const mongooseDocumentId = new mongoose.Types.ObjectId(documentId);
-            return this.lgDocumentModel.findOneAndUpdate({_id : new mongoose.Types.ObjectId(mongooseDocumentId)}, document);
-        } catch {
-            throw new HttpException("Wrong id format", 405)
-        }
+    async updateOne(document : LgDocumentDTO, documentId : string): Promise<LgDocument | HttpException> {
+        return this.lgDocumentModel.findOneAndUpdate({_id : documentId}, document);
     }
 
 
