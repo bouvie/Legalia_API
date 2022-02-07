@@ -1,7 +1,5 @@
-import {Body, Controller, HttpException, Post} from '@nestjs/common';
-import {BlocService} from "../bloc/bloc.service";
+import {Body, Controller, HttpException, Param, Post, Put} from '@nestjs/common';
 import {LgDocumentService} from "../lgDocument/lgDocument.service";
-import {BlocDTO} from "../bloc/bloc.model";
 import {VariableService} from "./variable.service";
 import {VariableDTO} from "./variable.model";
 
@@ -18,5 +16,14 @@ export class VariableController {
             return new HttpException("document not found", 405);
         }
         return this.variableServices.createOne(variable);
+    }
+
+    @Put(':variableId')
+    async updateOne(@Param('variableId') variableId : string, @Body() variable : VariableDTO) {
+        const variableDb = await this.variableServices.findOne(variableId);
+        if (!variableDb) {
+            return new HttpException("variable not found", 405);
+        }
+        return this.variableServices.updateOne(variableId, variable);
     }
 }
