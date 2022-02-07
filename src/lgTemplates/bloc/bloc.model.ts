@@ -12,7 +12,7 @@ export class Bloc extends Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: LgDocument.name, required : true })
     document: LgDocument;
 
-    @Prop({required : true })
+    @Prop()
     wordId: string;
 }
 
@@ -27,7 +27,5 @@ export class BlocDTO {
     @IsNotEmpty()
     document: string;
 
-    @IsDefined()
-    @IsNotEmpty()
     wordId: string;
 }

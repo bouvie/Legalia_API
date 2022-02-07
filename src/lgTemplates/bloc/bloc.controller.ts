@@ -1,7 +1,8 @@
-import {Body, Controller, HttpException, Post} from '@nestjs/common';
+import {Body, Controller, HttpException, Param, Post, Put} from '@nestjs/common';
 import {LgDocumentService} from "../lgDocument/lgDocument.service";
 import {BlocService} from "./bloc.service";
 import {BlocDTO} from "./bloc.model";
+import {VariableDTO} from "../variable/variable.model";
 
 @Controller('bloc')
 export class BlocController {
@@ -17,4 +18,14 @@ export class BlocController {
         }
         return this.blocServices.createOne(bloc);
     }
+
+    @Put('blocId')
+    async updateOne(@Body() bloc : BlocDTO, @Param(':blocId') blocId : string) {
+        const blocDb = await this.blocServices.findOne(blocId);
+        if (!blocDb) {
+            return new HttpException("bloc not found", 405);
+        }
+        return this.blocServices.updateOne(blocId, bloc);
+    }
+
 }

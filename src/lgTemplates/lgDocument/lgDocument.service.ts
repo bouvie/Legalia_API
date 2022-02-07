@@ -18,7 +18,9 @@ export class LgDocumentService {
     }
 
     async updateOne(document : LgDocumentDTO, documentId : string): Promise<LgDocument | HttpException> {
-        return this.lgDocumentModel.findOneAndUpdate({_id : documentId}, document);
+        await this.lgDocumentModel.findOneAndUpdate({_id : documentId}, document);
+        return this.lgDocumentModel.findOne({_id : documentId});
+
     }
 
 

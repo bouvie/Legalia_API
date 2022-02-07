@@ -15,4 +15,12 @@ export class VariableService {
         return this.variableModel.create(variable);
     }
 
+    async updateOne(variableId : string, variable : VariableDTO): Promise<Variable | HttpException> {
+        await this.variableModel.findOneAndUpdate({_id : variableId}, variable);
+        return this.variableModel.findOne({_id : variableId});
+    }
+
+    async findOne(variableId : string): Promise<Variable | HttpException> {
+        return this.variableModel.findOne({_id : variableId});
+    }
 }
