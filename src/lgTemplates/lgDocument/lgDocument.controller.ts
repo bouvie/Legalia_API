@@ -5,12 +5,16 @@ import * as jszip from "jszip";
 import * as path from "path";
 import {LgDocumentDTO} from "./lgDocument.model";
 import {UsersService} from "../../users/users.service";
-
+import {S3ManagerService} from "../../S3/S3-manager.service";
 
 @Controller('document')
 export class LgDocumentController {
-    constructor(private lgDocumentService: LgDocumentService,
-                private usersService: UsersService) {}
+    constructor(private lgDocumentService: LgDocumentService, private usersService: UsersService, private s3manager : S3ManagerService) {}
+
+    @Put('upload/:userId/documentId')
+    async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @Body() file : File) {
+        const s3response = await this.s3manager.uploadFile(userId, documentId, file)
+    }
 
     @Post('')
     async createOne(@Body() document : LgDocumentDTO) {

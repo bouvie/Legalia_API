@@ -23,7 +23,6 @@ export class LgDocumentService {
 
     }
 
-
     async findAll(): Promise<LgDocument[] | undefined> {
         return this.lgDocumentModel.find();
     }

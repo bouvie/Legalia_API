@@ -12,7 +12,9 @@ import {ConfigModule} from "@nestjs/config";
 import {VariableModule} from "./lgTemplates/variable/variable.module";
 
 @Module({
-  imports: [AuthModule, UsersModule, LgDocumentModule, BlocModule, VariableModule, ConfigModule.forRoot(), MongooseModule.forRoot(process.env.MONGODB_URI)],
+  imports: [AuthModule, UsersModule, LgDocumentModule, BlocModule, VariableModule, ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
+  ],
   controllers: [AppController],
   providers: [AppService,
   {
