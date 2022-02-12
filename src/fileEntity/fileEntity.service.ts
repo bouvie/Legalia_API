@@ -8,8 +8,8 @@ import {FileEntity} from "./fileEntity.model";
 export class FileEntityService {
     constructor(@InjectModel(FileEntity.name) private readonly fileEntityModel: Model<FileEntity>) {}
 
-    async uploadPublicFile(dataBuffer) {
-        const file : FileEntity = await this.fileEntityModel.create({});
+    async uploadPublicFile(dataBuffer, filename) {
+        const file : FileEntity = await this.fileEntityModel.create({filename : filename});
         const s3 = new S3();
         console.log(process.env.S3_BUCKET_NAME);
         const uploadResult = await s3.upload({

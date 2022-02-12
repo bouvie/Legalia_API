@@ -5,9 +5,13 @@ import {Document} from "mongoose";
 export class FileEntity extends Document {
 
     @Prop()
-    public url: string;
+    url: string;
 
-    public key: string;
+    @Prop()
+    key: string;
+
+    @Prop({required : true})
+    filename: string;
 }
 
 export const FileEntitySchema = SchemaFactory.createForClass(FileEntity);

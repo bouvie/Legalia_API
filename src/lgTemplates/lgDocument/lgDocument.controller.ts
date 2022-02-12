@@ -14,12 +14,13 @@ export class LgDocumentController {
 
     @Put('upload/:userId/:documentId')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @UploadedFile() file) {
+    async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @UploadedFile() file,
+                     @Body('filename') filename : string) {
         const lgDocument = await this.lgDocumentService.findOne(documentId);
         if (!lgDocument) {
             return new HttpException("document not found", 405);
         }
-        const fileEntity = await this.filesService.uploadPublicFile(file);
+        const fileEntity = await this.filesService.uploadPublicFile(file, filename);
         if (!fileEntity) {
             return new HttpException("error saving document", 501);
         }
