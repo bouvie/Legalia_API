@@ -1,19 +1,30 @@
-import {Body, Controller, Get, HttpException, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, Param, Post, Put, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
 import {LgDocumentDTO} from "./lgDocument.model";
 import {UsersService} from "../../users/users.service";
-import {S3ManagerService} from "../../S3/S3-manager.service";
+import {FileEntityService} from "../../fileEntity/fileEntity.service";
+import {FileInterceptor} from "@nestjs/platform-express";
 
 @Controller('document')
 export class LgDocumentController {
-    constructor(private lgDocumentService: LgDocumentService, private usersService: UsersService, private s3manager : S3ManagerService) {}
+    constructor(private lgDocumentService: LgDocumentService, private usersService: UsersService, private filesService : FileEntityService) {}
 
-    @Put('upload/:userId/documentId')
-    async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @Body() file : File) {
-        const s3response = await this.s3manager.uploadFile(userId, documentId, file)
+    @Put('upload/:userId/:documentId')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @UploadedFile() file) {
+        const lgDocument = await this.lgDocumentService.findOne(documentId);
+        if (!lgDocument) {
+            return new HttpException("document not found", 405);
+        }
+        const fileEntity = await this.filesService.uploadPublicFile(file);
+        if (!fileEntity) {
+            return new HttpException("error saving document", 501);
+        }
+        lgDocument.file = fileEntity;
+        return this.lgDocumentService.updateOne(lgDocument, documentId);
     }
 
     @Post('')

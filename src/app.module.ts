@@ -21,6 +21,6 @@ import {VariableModule} from "./lgTemplates/variable/variable.module";
     provide: APP_GUARD,
     useClass: JwtAuthGuard,
   },
-]
+],
 })
 export class AppModule {}

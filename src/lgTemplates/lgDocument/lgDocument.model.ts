@@ -3,13 +3,14 @@ import { Document } from 'mongoose';
 import * as mongoose from "mongoose";
 import {Users} from "../../users/users.model";
 import {IsNotEmpty, IsDefined } from 'class-validator';
+import {FileEntity} from "../../fileEntity/fileEntity.model";
 @Schema()
 export class LgDocument extends Document {
     @Prop()
     name: string;
 
-    @Prop()
-    path: string;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: FileEntity.name})
+    file: FileEntity;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Users.name, required : true })
     user: Users;
@@ -22,7 +23,7 @@ export class LgDocumentDTO {
     name: string;
 
     @Prop()
-    path: string;
+    file: string;
 
     @IsDefined()
     @IsNotEmpty()
