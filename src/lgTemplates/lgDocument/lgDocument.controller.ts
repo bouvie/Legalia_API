@@ -15,7 +15,7 @@ export class LgDocumentController {
     @Put('upload/:userId/:documentId')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@Param('documentId') documentId : string, @Param('userId') userId : string, @UploadedFile() file,
-                     @Body('filename') filename : string) {
+                     @Body('filename') filename : string, @Body('documentName') documentName : string) {
         const lgDocument = await this.lgDocumentService.findOne(documentId);
         if (!lgDocument) {
             return new HttpException("document not found", 405);
@@ -25,6 +25,7 @@ export class LgDocumentController {
             return new HttpException("error saving document", 501);
         }
         lgDocument.file = fileEntity;
+        lgDocument.name = documentName
         return this.lgDocumentService.updateOne(lgDocument, documentId);
     }
 
