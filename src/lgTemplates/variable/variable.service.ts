@@ -23,4 +23,8 @@ export class VariableService {
     async findOne(variableId : string): Promise<Variable | HttpException> {
         return this.variableModel.findOne({_id : variableId});
     }
+
+    async findByTemplate(templateId : string): Promise<Variable[] | HttpException> {
+        return this.variableModel.find({document : templateId});
+    }
 }

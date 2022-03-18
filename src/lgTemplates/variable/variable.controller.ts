@@ -1,4 +1,4 @@
-import {Body, Controller, HttpException, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, Param, Post, Put} from '@nestjs/common';
 import {LgDocumentService} from "../lgDocument/lgDocument.service";
 import {VariableService} from "./variable.service";
 import {VariableDTO} from "./variable.model";
@@ -25,5 +25,10 @@ export class VariableController {
             return new HttpException("variable not found", 405);
         }
         return this.variableServices.updateOne(variableId, variable);
+    }
+
+    @Get(':templateId')
+    async getByTemplate(@Param('templateId') templateId : string) {
+        return this.variableServices.findByTemplate(templateId);
     }
 }
