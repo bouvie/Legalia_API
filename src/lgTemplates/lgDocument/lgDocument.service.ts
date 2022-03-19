@@ -13,6 +13,10 @@ export class LgDocumentService {
         return this.lgDocumentModel.findOne({_id : documentId});
     }
 
+    async findOneAndPopulateFile(documentId: string): Promise<LgDocument | undefined> {
+        return this.lgDocumentModel.findOne({_id : documentId}).populate('file');
+    }
+
     async createOne(document : LgDocumentDTO): Promise<LgDocument | HttpException> {
             return this.lgDocumentModel.create(document);
     }

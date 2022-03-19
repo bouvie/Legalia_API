@@ -3,10 +3,12 @@ import {LgDocumentService} from "./lgDocument.service";
 import * as fs from "fs";
 import * as jszip from "jszip";
 import * as path from "path";
-import {LgDocumentDTO} from "./lgDocument.model";
+import {LgDocument, LgDocumentDTO} from "./lgDocument.model";
 import {UsersService} from "../../users/users.service";
 import {FileEntityService} from "../../fileEntity/fileEntity.service";
 import {FileInterceptor} from "@nestjs/platform-express";
+import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
+import {Readable} from "stream";
 
 @Controller('document')
 export class LgDocumentController {
@@ -59,37 +61,66 @@ export class LgDocumentController {
     }
 
     @Post('/compute/:documentId')
-    async computeTemplate(@Param('documentId') documentId : string){
-        const content = fs.readFileSync(
-            path.resolve( "./test.docx"),
-            "binary"
-        );
-
-        const zip = await jszip.loadAsync(content);
-
+    async computeTemplate(@Param('documentId') documentId : string, @Body('variables') variables : any){
+        const lgDocument = await this.lgDocumentService.findOneAndPopulateFile(documentId);
+        if (!lgDocument) {
+            return new HttpException("document not found", 405);
+        }
+        const s3file = await getObjectFromAWS(process.env.S3_BUCKET_NAME,lgDocument.file._id.toString(), lgDocument);
+        const zip = await jszip.loadAsync(s3file);
         let document = await zip.file('word/document.xml').async("text");
 
-        let id = 0;
-        const name = ["bclij8769s", "z2qsv1u4va"];
-        const variableName = "Variable";
-        let reDoc = new RegExp("(?<=<w:bookmarkStart w:id=\"" + id + "\" w:name=\"" + name[id] + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + id + "\"/>)")
-        while (document.search(reDoc) > 0) {
+        variables.forEach((variable) => {
+            console.log(variable);
+            let reDoc = new RegExp("(?<=<w:bookmarkStart w:id=\"" + variable.wordId + "\" w:name=\"" + "_Lg" + variable._id + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + variable.wordId + "\"/>)")
             const bookmark = reDoc.exec(document)[1];
-            const computedBookmark = bookmark.replace("<w:t>" + variableName + "</w:t>", "<w:t>toto</w:t>")
+            const computedBookmark = bookmark.replace("<w:t>" + variable.name + "</w:t>", "<w:t>" + variable.value +"</w:t>")
             document = document.replace(reDoc, computedBookmark);
-            id++;
-            reDoc = new RegExp("(?<=<w:bookmarkStart w:id=\"" + id + "\" w:name=\"" + name[id] + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + id + "\"/>)")
-        }
-
+        })
 
         zip.file("word/document.xml", document);
 
         zip
-            .generateNodeStream({type:'nodebuffer',streamFiles:true})
+            .generateNodeStream({type: 'nodebuffer', streamFiles: true})
             .pipe(fs.createWriteStream('computed.docx'))
             .on('finish', function () {
                 console.log("out.zip written.");
             });
     }
 
+}
+
+function getObjectFromAWS(Bucket : string, Key : string, lgDocument : LgDocument) : Promise<Buffer> {
+    const client = new S3Client({region:'eu-west-3',});
+
+    return new Promise(async (resolve, reject) : Promise<Buffer | void> => {
+        const getObjectCommand = new GetObjectCommand({ Bucket, Key })
+
+        try {
+            const response = await client.send(getObjectCommand)
+
+            // Store all of data chunks returned from the response data stream
+            // into an array then use Array#join() to use the returned contents as a String
+            let responseDataChunks = []
+
+            // Handle an error while streaming the response body
+            if (response.Body instanceof Readable) {
+                response.Body.once('error', err => reject(err))
+            }
+
+            // Attach a 'data' listener to add the chunks of data to our array
+            // Each chunk is a Buffer instance
+            if (response.Body instanceof Readable) {
+                response.Body.on('data', chunk => responseDataChunks.push(chunk))
+            }
+
+            // Once the stream has no more data, join the chunks into a string and return the string
+            if (response.Body instanceof Readable) {
+                response.Body.once('end', () => resolve(Buffer.concat(responseDataChunks)))
+            }
+        } catch (err) {
+            // Handle the error or throw
+            return reject(err)
+        }
+    })
 }
