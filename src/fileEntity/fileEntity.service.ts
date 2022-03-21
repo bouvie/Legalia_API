@@ -29,8 +29,7 @@ export class FileEntityService {
         const s3 = new S3();
         const downloadParams = {
                 Key: file.key,
-                Bucket: process.env.S3_BUCKET_NAME,
-                signatureVersion: 'v4',
+                Bucket: process.env.S3_BUCKET_NAME
             };
         return new Promise<string>((resolve, reject) => {
             s3.getSignedUrl('getObject', downloadParams, function (err, url) {
