@@ -16,7 +16,7 @@ export class LgDocument extends Document {
     @Prop()
     name : string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: FileEntity.name})
+    @Prop({ ref: FileEntity.name})
     generatedAt: FileEntity[];
 
 }

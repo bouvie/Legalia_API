@@ -93,9 +93,9 @@ export class LgDocumentController {
             .then(async (content) => {
                const file = await this.filesService.uploadPublicFile({buffer : content, name : lgDocument._id + 'computed.docx'}, lgDocument._id.toString() + 'computed.docx', true);
                if (!lgDocument.generatedAt) {
-                   lgDocument.generatedAt = [file];
+                   lgDocument.generatedAt = [file._id];
                } else {
-                   lgDocument.generatedAt.push(file);
+                   lgDocument.generatedAt.push(file._id);
                }
                await lgDocument.save();
                return this.filesService.downloadFile(file);
