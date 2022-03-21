@@ -1,8 +1,16 @@
-import {Body, Controller, Get, HttpException, Param, Post, Put, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    Param,
+    Post,
+    Put,
+    UploadedFile,
+    UseInterceptors
+} from '@nestjs/common';
 import {LgDocumentService} from "./lgDocument.service";
-import * as fs from "fs";
 import * as jszip from "jszip";
-import * as path from "path";
 import {LgDocument, LgDocumentDTO} from "./lgDocument.model";
 import {UsersService} from "../../users/users.service";
 import {FileEntityService} from "../../fileEntity/fileEntity.service";
@@ -61,30 +69,32 @@ export class LgDocumentController {
     }
 
     @Post('/compute/:documentId')
-    async computeTemplate(@Param('documentId') documentId : string, @Body('variables') variables : any){
+    async computeTemplate(@Param('documentId') documentId : string, @Body('variables') variables : any) {
         const lgDocument = await this.lgDocumentService.findOneAndPopulateFile(documentId);
         if (!lgDocument) {
             return new HttpException("document not found", 405);
         }
-        const s3file = await getObjectFromAWS(process.env.S3_BUCKET_NAME,lgDocument.file._id.toString(), lgDocument);
+        const s3file = await getObjectFromAWS(process.env.S3_BUCKET_NAME, lgDocument.file._id.toString(), lgDocument);
         const zip = await jszip.loadAsync(s3file);
         let document = await zip.file('word/document.xml').async("text");
 
         variables.forEach((variable) => {
-            console.log(variable);
-            let reDoc = new RegExp("(?<=<w:bookmarkStart w:id=\"" + variable.wordId + "\" w:name=\"" + "_Lg" + variable._id + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + variable.wordId + "\"/>)")
-            const bookmark = reDoc.exec(document)[1];
-            const computedBookmark = bookmark.replace("<w:t>" + variable.name + "</w:t>", "<w:t>" + variable.value +"</w:t>")
-            document = document.replace(reDoc, computedBookmark);
+            const wordIdRe = new RegExp("(?<=<w:bookmarkStart w:id=\"(.*?)\" w:name=\"" + "_Lg" + variable._id + "\"/>)");
+            const wordId = wordIdRe.exec(document)[1];
+            const bookMarkRe = new RegExp("(?<=<w:bookmarkStart w:id=\"" + wordId + "\" w:name=\"" + "_Lg" + variable._id + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + wordId + "\"/>)")
+            const bookmark = bookMarkRe.exec(document)[1];
+            const computedBookmark = bookmark.replace("<w:t>" + variable.name + "</w:t>", "<w:t>" + variable.value + "</w:t>")
+            document = document.replace(bookMarkRe, computedBookmark);
         })
 
         zip.file("word/document.xml", document);
-
-        zip
-            .generateNodeStream({type: 'nodebuffer', streamFiles: true})
-            .pipe(fs.createWriteStream('computed.docx'))
-            .on('finish', function () {
-                console.log("out.zip written.");
+        return zip
+            .generateAsync({type: 'nodebuffer', streamFiles: true})
+            .then(async (content) => {
+               const file = await this.filesService.uploadPublicFile({buffer : content, name : lgDocument._id + 'computed.docx'}, lgDocument._id.toString() + 'computed.docx', true);
+               lgDocument.generatedAt = file;
+               await lgDocument.save();
+               return this.filesService.downloadFile(file);
             });
     }
 

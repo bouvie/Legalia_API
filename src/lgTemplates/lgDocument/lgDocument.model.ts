@@ -2,8 +2,9 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from "mongoose";
 import {Users} from "../../users/users.model";
-import {IsNotEmpty, IsDefined, isAlphanumeric} from 'class-validator';
+import {IsNotEmpty, IsDefined} from 'class-validator';
 import {FileEntity} from "../../fileEntity/fileEntity.model";
+
 @Schema()
 export class LgDocument extends Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: FileEntity.name})
@@ -13,7 +14,11 @@ export class LgDocument extends Document {
     user: Users;
 
     @Prop()
-    name : string
+    name : string;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: FileEntity.name})
+    generatedAt: FileEntity;
+
 }
 
 export const LgDocumentSchema = SchemaFactory.createForClass(LgDocument);
