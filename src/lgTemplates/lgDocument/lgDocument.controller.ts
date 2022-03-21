@@ -92,7 +92,11 @@ export class LgDocumentController {
             .generateAsync({type: 'nodebuffer', streamFiles: true})
             .then(async (content) => {
                const file = await this.filesService.uploadPublicFile({buffer : content, name : lgDocument._id + 'computed.docx'}, lgDocument._id.toString() + 'computed.docx', true);
-               lgDocument.generatedAt = file;
+               if (!lgDocument.generatedAt) {
+                   lgDocument.generatedAt = [file];
+               } else {
+                   lgDocument.generatedAt.push(file);
+               }
                await lgDocument.save();
                return this.filesService.downloadFile(file);
             });
