@@ -16,7 +16,7 @@ export class FileEntityService {
         const uploadResult = await s3.upload({
             Bucket: process.env.S3_BUCKET_NAME,
             Body: dataBuffer.buffer,
-            Key: key
+            Key: key,
         })
             .promise();
         file.key = uploadResult.Key;
@@ -30,6 +30,7 @@ export class FileEntityService {
         const downloadParams = {
                 Key: file.key,
                 Bucket: process.env.S3_BUCKET_NAME,
+                signatureVersion: 'v4',
             };
         return new Promise<string>((resolve, reject) => {
             s3.getSignedUrl('getObject', downloadParams, function (err, url) {
