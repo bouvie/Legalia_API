@@ -80,11 +80,14 @@ export class LgDocumentController {
 
         variables.forEach((variable) => {
             const wordIdRe = new RegExp("(?<=<w:bookmarkStart w:id=\"(.*?)\" w:name=\"" + "_Lg" + variable._id + "\"/>)");
-            const wordId = wordIdRe.exec(document)[1];
-            const bookMarkRe = new RegExp("(?<=<w:bookmarkStart w:id=\"" + wordId + "\" w:name=\"" + "_Lg" + variable._id + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + wordId + "\"/>)")
-            const bookmark = bookMarkRe.exec(document)[1];
-            const computedBookmark = bookmark.replace("<w:t>" + variable.name + "</w:t>", "<w:t>" + variable.value + "</w:t>")
-            document = document.replace(bookMarkRe, computedBookmark);
+            console.log(variable._id);
+            if (wordIdRe.exec(document)) {
+                const wordId = wordIdRe.exec(document)[1];
+                const bookMarkRe = new RegExp("(?<=<w:bookmarkStart w:id=\"" + wordId + "\" w:name=\"" + "_Lg" + variable._id + "\"/>)(.*?)(?=<w:bookmarkEnd w:id=\"" + wordId + "\"/>)")
+                const bookmark = bookMarkRe.exec(document)[1];
+                const computedBookmark = bookmark.replace("<w:t>" + variable.name + "</w:t>", "<w:t>" + variable.value ? variable.value : '' + "</w:t>")
+                document = document.replace(bookMarkRe, computedBookmark);
+            }
         })
 
         zip.file("word/document.xml", document);
